@@ -3,9 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <title>❤️ KIROBOT - Rehabilitación con Cariño</title>
-  <!-- ... tus estilos (sin cambios) ... -->
   <style>
-    /* Tus estilos originales van acá (omitidos por brevedad) */
+    body {
+      font-family: "Segoe UI", "Verdana", sans-serif;
+      background: #e7f5f8;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      margin-top: 30px;
+      font-size: 2rem;
+      color: #007f7f;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .grid div {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      transition: transform 0.2s ease;
+    }
+
+    .grid div:hover {
+      transform: scale(1.03);
+    }
+
+    .grid p {
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .img-btn {
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      border-radius: 15px;
+      border: 3px solid #79c2c2;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .img-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .video-container {
+      display: none;
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    video, .gif-viewer {
+      width: 320px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+    }
+
+    iframe {
+      border: none;
+      margin-top: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 20px;
+      background-color: #00a9a5;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #007f7f;
+    }
+
+    #btn-siguiente {
+      display: none;
+    }
+
+    #titulo-ejercicio {
+      font-size: 1.5rem;
+      color: #007f7f;
+      margin-bottom: 20px;
+    }
+
+    #form-nombre {
+      margin-top: 40px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      font-size: 16px;
+      width: 250px;
+    }
   </style>
 </head>
 <body>
@@ -88,7 +203,7 @@
         gif.style.display = 'block';
       }
 
-      fetch(`http://192.168.0.100/${encodeURIComponent(ruta)}`)
+      fetch(http://192.168.0.100/${encodeURIComponent(ruta)})
         .then(() => console.log("Orden enviada a la ESP32"))
         .catch(err => console.error("Error al enviar orden:", err));
 
@@ -122,11 +237,11 @@
       gifViewer.style.display = 'block';
       document.getElementById('video-ejercicio').style.display = 'none';
 
-      fetch(`http://192.168.0.100/${encodeURIComponent(gif)}`)
+      fetch(http://192.168.0.100/${encodeURIComponent(gif)})
         .then(() => console.log("GIF enviado a la ESP32"))
         .catch(err => console.error("Error al enviar GIF:", err));
 
-      registrarEjercicio(`${ejercicioNombre} - Parte ${indiceGIF + 1}`);
+      registrarEjercicio(${ejercicioNombre} - Parte ${indiceGIF + 1});
       indiceGIF++;
     }
 
@@ -145,15 +260,16 @@
       indiceGIF = 0;
     }
 
-    // ✅ FUNCIÓN ACTUALIZADA CON FormData
     function registrarEjercicio(nombreEjercicio) {
-      const data = new FormData();
-      data.append("nombre", nombrePaciente);
-      data.append("ejercicio", nombreEjercicio);
-
       fetch("https://script.google.com/macros/s/AKfycbwMMwrjdQZISUjCeIAqQ_sOiJFvQDPp8US1nQcHbpiNp-R_FoAz5laI16O_tnWG5mdQzw/exec", {
         method: "POST",
-        body: data
+        body: JSON.stringify({
+          nombre: nombrePaciente,
+          ejercicio: nombreEjercicio
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
       })
       .then(res => console.log("Datos enviados a Google Sheets"))
       .catch(err => console.error("Error al registrar ejercicio:", err));
