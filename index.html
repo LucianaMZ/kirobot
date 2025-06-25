@@ -148,7 +148,7 @@
       <p>Zona abdominal (circuito)</p>
     </div>
     <div>
-      <img class="img-btn" src="musculo-8783986_960_720.png" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas')">
+      <img class="img-btn" src="musculo-8783986_960_720.png" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas para adultos mayores')">
       <p>Flexión de piernas</p>
     </div>
   </div>
@@ -203,7 +203,7 @@
         gif.style.display = 'block';
       }
 
-      fetch(http://192.168.0.100/${encodeURIComponent(ruta)})
+      fetch(`http://192.168.0.100/${encodeURIComponent(ruta)}`)
         .then(() => console.log("Orden enviada a la ESP32"))
         .catch(err => console.error("Error al enviar orden:", err));
 
@@ -237,11 +237,11 @@
       gifViewer.style.display = 'block';
       document.getElementById('video-ejercicio').style.display = 'none';
 
-      fetch(http://192.168.0.100/${encodeURIComponent(gif)})
+      fetch(`http://192.168.0.100/${encodeURIComponent(gif)}`)
         .then(() => console.log("GIF enviado a la ESP32"))
         .catch(err => console.error("Error al enviar GIF:", err));
 
-      registrarEjercicio(${ejercicioNombre} - Parte ${indiceGIF + 1});
+      registrarEjercicio(`${ejercicioNombre} - Parte ${indiceGIF + 1}`);
       indiceGIF++;
     }
 
@@ -261,7 +261,7 @@
     }
 
     function registrarEjercicio(nombreEjercicio) {
-      fetch("https://script.google.com/macros/s/AKfycbwMMwrjdQZISUjCeIAqQ_sOiJFvQDPp8US1nQcHbpiNp-R_FoAz5laI16O_tnWG5mdQzw/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbyMQzDEqBhNHYDA1NwMEBDUYJUJhBQWJ-JMAcETi5OT0AWRVHAGh0KOO93AMj2Z44xd/exec", {
         method: "POST",
         body: JSON.stringify({
           nombre: nombrePaciente,
