@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>❤️ KIROBOT - Rehabilitación con Cariño</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Verdana", sans-serif;
+      background: #e7f5f8;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      margin-top: 30px;
+      font-size: 2rem;
+      color: #007f7f;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .grid div {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      transition: transform 0.2s ease;
+    }
+
+    .grid div:hover {
+      transform: scale(1.03);
+    }
+
+    .grid p {
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .img-btn {
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      border-radius: 15px;
+      border: 3px solid #79c2c2;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .img-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .video-container {
+      display: none;
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    video, .gif-viewer {
+      width: 320px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+    }
+
+    iframe {
+      border: none;
+      margin-top: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 20px;
+      background-color: #00a9a5;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #007f7f;
+    }
+
+    #btn-siguiente {
+      display: none;
+    }
+
+    #titulo-ejercicio {
+      font-size: 1.5rem;
+      color: #007f7f;
+      margin-bottom: 20px;
+    }
+
+    #form-nombre {
+      margin-top: 40px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      font-size: 16px;
+      width: 250px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>❤️ KIROBOT: Ejercicios de Rehabilitación</h1>
+
+  <div id="form-nombre">
+    <h2>Ingresá tu nombre</h2>
+    <input type="text" id="nombrePaciente" placeholder="Nombre del paciente">
+    <br><br>
+    <button onclick="guardarNombre()">Comenzar</button>
+  </div>
+
+  <div class="grid" id="menu" style="display: none;">
+    <div>
+      <img class="img-btn" src="Captura de pantalla 2025-05-31 141509.png" onclick="iniciarEjercicio('videos/Woman Doing Neck Lateral Stretching.mp4', 'Estiramiento lateral de cuello')">
+      <p>Estiramiento de cuello</p>
+    </div>
+    <div>
+      <img class="img-btn" src="depositphotos_17236893-stock-illustration-human-arm-and-hand-extended.jpg" onclick="iniciarEjercicio('videos/Man standing overhead.mp4', 'Elevación de brazos de pie')">
+      <p>Elevación de brazos</p>
+    </div>
+    <div>
+      <img class="img-btn" src="istockphoto-1064287648-612x612.jpg" onclick="iniciarCircuito(['videos/abdominal 1.gif', 'videos/abdominal 2.gif'], 'Circuito zona abdominal')">
+      <p>Zona abdominal (circuito)</p>
+    </div>
+    <div>
+      <img class="img-btn" src="musculo-8783986_960_720.png" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas para adultos mayores')">
+      <p>Flexión de piernas</p>
+    </div>
+  </div>
+
+  <div class="video-container" id="video-container">
+    <h2 id="titulo-ejercicio">Ejercicio en curso</h2>
+    <video id="video-ejercicio" controls autoplay muted style="display: none;"></video>
+    <img id="gif-ejercicio" class="gif-viewer" style="display: none;"><br>
+    <iframe id="cam" src="" width="320" height="240"></iframe><br>
+    <button id="btn-siguiente" onclick="mostrarSiguiente()">Siguiente ejercicio</button><br>
+    <button onclick="volver()">Volver al menú</button>
+  </div>
+
+  <script>
+    let listaGIFs = [];
+    let ejercicioNombre = '';
+    let indiceGIF = 0;
+    let nombrePaciente = "";
+
+    function guardarNombre() {
+      const input = document.getElementById("nombrePaciente").value.trim();
+      if (input === "") {
+        alert("Por favor ingresá tu nombre.");
+        return;
+      }
+      nombrePaciente = input;
+      document.getElementById("form-nombre").style.display = "none";
+      document.getElementById("menu").style.display = "grid";
+    }
+
+    function iniciarEjercicio(ruta, nombre) {
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('video-container').style.display = 'flex';
+
+      document.getElementById('titulo-ejercicio').innerText = nombre;
+      document.getElementById('cam').src = "http://192.168.0.100:81/stream";
+
+      document.getElementById('gif-ejercicio').style.display = 'none';
+      document.getElementById('gif-ejercicio').src = '';
+      document.getElementById('video-ejercicio').style.display = 'none';
+      document.getElementById('video-ejercicio').src = '';
+      document.getElementById('btn-siguiente').style.display = 'none';
+
+      if (ruta.endsWith('.mp4')) {
+        const video = document.getElementById('video-ejercicio');
+        video.src = ruta;
+        video.style.display = 'block';
+        video.play();
+      } else if (ruta.endsWith('.gif')) {
+        const gif = document.getElementById('gif-ejercicio');
+        gif.src = ruta;
+        gif.style.display = 'block';
+      }
+
+      fetch(`http://192.168.0.100/${encodeURIComponent(ruta)}`)
+        .then(() => console.log("Orden enviada a la ESP32"))
+        .catch(err => console.error("Error al enviar orden:", err));
+
+      registrarEjercicio(nombre);
+    }
+
+    function iniciarCircuito(gifs, nombre) {
+      listaGIFs = gifs;
+      ejercicioNombre = nombre;
+      indiceGIF = 0;
+
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('video-container').style.display = 'flex';
+      document.getElementById('titulo-ejercicio').innerText = nombre;
+      document.getElementById('btn-siguiente').style.display = 'inline-block';
+      document.getElementById('video-ejercicio').style.display = 'none';
+      document.getElementById('cam').src = "http://192.168.0.100:81/stream";
+
+      mostrarSiguiente();
+    }
+
+    function mostrarSiguiente() {
+      if (indiceGIF >= listaGIFs.length) {
+        volver();
+        return;
+      }
+
+      const gif = listaGIFs[indiceGIF];
+      const gifViewer = document.getElementById('gif-ejercicio');
+      gifViewer.src = gif;
+      gifViewer.style.display = 'block';
+      document.getElementById('video-ejercicio').style.display = 'none';
+
+      fetch(`http://192.168.0.100/${encodeURIComponent(gif)}`)
+        .then(() => console.log("GIF enviado a la ESP32"))
+        .catch(err => console.error("Error al enviar GIF:", err));
+
+      registrarEjercicio(`${ejercicioNombre} - Parte ${indiceGIF + 1}`);
+      indiceGIF++;
+    }
+
+    function volver() {
+      document.getElementById('video-container').style.display = 'none';
+      document.getElementById('menu').style.display = 'grid';
+
+      document.getElementById('cam').src = "";
+      document.getElementById('video-ejercicio').src = "";
+      document.getElementById('gif-ejercicio').src = "";
+      document.getElementById('titulo-ejercicio').innerText = "Ejercicio en curso";
+      document.getElementById('gif-ejercicio').style.display = 'none';
+      document.getElementById('btn-siguiente').style.display = 'none';
+
+      listaGIFs = [];
+      indiceGIF = 0;
+    }
+
+    function registrarEjercicio(nombreEjercicio) {
+      fetch("https://script.google.com/macros/s/AKfycbyMQzDEqBhNHYDA1NwMEBDUYJUJhBQWJ-JMAcETi5OT0AWRVHAGh0KOO93AMj2Z44xd/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          nombre: nombrePaciente,
+          ejercicio: nombreEjercicio
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => console.log("Datos enviados a Google Sheets"))
+      .catch(err => console.error("Error al registrar ejercicio:", err));
+    }
+  </script>
+
+</body>
+</html>
