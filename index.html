@@ -110,10 +110,6 @@
       margin-bottom: 20px;
     }
 
-    #form-nombre {
-      margin-top: 40px;
-    }
-
     input[type="text"], input[type="number"], select {
       padding: 10px;
       border-radius: 10px;
@@ -131,56 +127,83 @@
 
   <h1>❤️ KIROBOT: Ejercicios de Rehabilitación</h1>
 
-  <div id="form-nombre">
-    <h2>Ingresá tus datos</h2>
-
-    <!-- FORMULARIO PARA BACKEND -->
-    <form id="formulario">
-      <input type="text" name="nombreApellido" placeholder="Nombre y Apellido" required />
-      <input type="number" name="edad" placeholder="Edad" required />
-
-      <select name="sexo" required>
-        <option value="" disabled selected>Sexo</option>
-        <option value="Femenino">Femenino</option>
-        <option value="Masculino">Masculino</option>
-        <option value="Otro">Otro</option>
-      </select>
-
-      <select name="ejercicio" required>
-        <option value="" disabled selected>Ejercicio</option>
-        <option value="Sentadillas">Sentadillas</option>
-        <option value="Flexiones">Flexiones</option>
-        <option value="Abdominales">Abdominales</option>
-      </select>
-
-      <button type="submit">Enviar</button>
-    </form>
-  </div>
+  <form id="formulario">
+    <input type="text" name="nombreApellido" placeholder="Nombre y Apellido" required />
+    <input type="number" name="edad" placeholder="Edad" required />
+    <select name="sexo" required>
+      <option value="" disabled selected>Sexo</option>
+      <option value="Femenino">Femenino</option>
+      <option value="Masculino">Masculino</option>
+      <option value="Otro">Otro</option>
+    </select>
+    <select name="ejercicio" required>
+      <option value="" disabled selected>Ejercicio</option>
+      <option value="Sentadillas">Sentadillas</option>
+      <option value="Flexiones">Flexiones</option>
+      <option value="Abdominales">Abdominales</option>
+    </select>
+    <button type="submit">Enviar</button>
+  </form>
 
   <div class="grid" id="menu" style="display: none;">
-    <!-- ... tus ejercicios ya agregados ... -->
+    <div>
+      <img class="img-btn" src="Captura de pantalla 2025-05-31 141509.png" onclick="iniciarEjercicio('videos/Woman Doing Neck Lateral Stretching.mp4', 'Estiramiento lateral de cuello')">
+      <p>Estiramiento de cuello</p>
+    </div>
+    <div>
+      <img class="img-btn" src="depositphotos_17236893-stock-illustration-human-arm-and-hand-extended.jpg" onclick="iniciarEjercicio('videos/Man standing overhead.mp4', 'Elevación de brazos de pie')">
+      <p>Elevación de brazos</p>
+    </div>
+    <div>
+      <img class="img-btn" src="istockphoto-1064287648-612x612.jpg" onclick="iniciarCircuito(['videos/abdominal 1.gif', 'videos/abdominal 2.gif'], 'Circuito zona abdominal')">
+      <p>Zona abdominal (circuito)</p>
+    </div>
+    <div>
+      <img class="img-btn" src="musculo-8783986_960_720.png" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas para adultos mayores')">
+      <p>Flexión de piernas</p>
+    </div>
   </div>
 
   <div class="video-container" id="video-container">
-    <!-- ... tu sección de ejercicios y ESP32-CAM ... -->
+    <h2 id="titulo-ejercicio">Ejercicio en curso</h2>
+    <video id="video-ejercicio" controls autoplay muted style="display: none;"></video>
+    <img id="gif-ejercicio" class="gif-viewer" style="display: none;"><br>
+    <iframe id="cam" src="" width="320" height="240"></iframe><br>
+    <button id="btn-siguiente" onclick="mostrarSiguiente()">Siguiente ejercicio</button><br>
+    <button onclick="volver()">Volver al menú</button>
   </div>
 
   <script>
     let listaGIFs = [];
     let ejercicioNombre = '';
     let indiceGIF = 0;
-    let nombrePaciente = "";
 
-    function guardarNombre() {
-      const input = document.getElementById("nombrePaciente").value.trim();
-      if (input === "") {
-        alert("Por favor ingresá tu nombre.");
-        return;
+    document.getElementById("formulario").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const datos = {
+        nombreApellido: form.nombreApellido.value,
+        edad: parseInt(form.edad.value),
+        sexo: form.sexo.value,
+        ejercicio: form.ejercicio.value,
+        fechaHora: new Date().toISOString()
+      };
+      const backendURL = "https://backend-production-0730.up.railway.app/enviar-datos";
+      try {
+        const res = await fetch(backendURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datos)
+        });
+        const respuesta = await res.json();
+        alert(respuesta.mensaje || "Datos enviados");
+        form.style.display = "none";
+        document.getElementById("menu").style.display = "grid";
+      } catch (err) {
+        alert("Error al enviar los datos");
+        console.error(err);
       }
-      nombrePaciente = input;
-      document.getElementById("form-nombre").style.display = "none";
-      document.getElementById("menu").style.display = "grid";
-    }
+    });
 
     function iniciarEjercicio(ruta, nombre) {
       document.getElementById('menu').style.display = 'none';
@@ -209,8 +232,6 @@
       fetch(`http://192.168.0.100/${encodeURIComponent(ruta)}`)
         .then(() => console.log("Orden enviada a la ESP32"))
         .catch(err => console.error("Error al enviar orden:", err));
-
-      registrarEjercicio(nombre);
     }
 
     function iniciarCircuito(gifs, nombre) {
@@ -244,7 +265,6 @@
         .then(() => console.log("GIF enviado a la ESP32"))
         .catch(err => console.error("Error al enviar GIF:", err));
 
-      registrarEjercicio(`${ejercicioNombre} - Parte ${indiceGIF + 1}`);
       indiceGIF++;
     }
 
@@ -262,52 +282,6 @@
       listaGIFs = [];
       indiceGIF = 0;
     }
-
-    function registrarEjercicio(nombreEjercicio) {
-      fetch("https://script.google.com/macros/s/AKfycbyMQzDEqBhNHYDA1NwMEBDUYJUJhBQWJ-JMAcETi5OT0AWRVHAGh0KOO93AMj2Z44xd/exec", {
-        method: "POST",
-        body: JSON.stringify({
-          nombre: nombrePaciente,
-          ejercicio: nombreEjercicio
-        }),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => console.log("Datos enviados a Google Sheets"))
-      .catch(err => console.error("Error al registrar ejercicio:", err));
-    }
-
-    // Envío de datos al backend de Railway
-    document.getElementById("formulario").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = e.target;
-      const datos = {
-        nombreApellido: form.nombreApellido.value,
-        edad: parseInt(form.edad.value),
-        sexo: form.sexo.value,
-        ejercicio: form.ejercicio.value,
-        fechaHora: new Date().toISOString()
-      };
-
-      const backendURL = "https://backend-production-0730.up.railway.app/enviar-datos";
-
-      try {
-        const res = await fetch(backendURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(datos)
-        });
-
-        const respuesta = await res.json();
-        alert(respuesta.mensaje || "Datos enviados");
-        form.reset();
-      } catch (err) {
-        alert("Error al enviar los datos");
-        console.error(err);
-      }
-    });
   </script>
 
 </body>
