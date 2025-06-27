@@ -188,6 +188,26 @@
       // La URL de tu ESP32 (¡Asegúrate de que esta IP sea correcta!)
       const esp32URL = "http://192.168.0.100/activar"; 
 
+      // Ocultar el formulario y mostrar el menú de ejercicios INMEDIATAMENTE
+      console.log("DEBUG: Ocultando formulario y mostrando menú...");
+      const formularioElement = document.getElementById("formulario");
+      const menuElement = document.getElementById("menu");
+
+      if (formularioElement) {
+        formularioElement.style.display = "none";
+        console.log("DEBUG: Formulario oculto. Display actual:", formularioElement.style.display);
+      } else {
+        console.error("DEBUG: Elemento 'formulario' no encontrado.");
+      }
+
+      if (menuElement) {
+        menuElement.style.display = "grid";
+        console.log("DEBUG: Menú mostrado. Display actual:", menuElement.style.display);
+      } else {
+        console.error("DEBUG: Elemento 'menu' no encontrado.");
+      }
+      console.log("DEBUG: Transición de UI iniciada.");
+
       let backendSuccess = false; // Bandera para rastrear el éxito del fetch al backend
       try {
         const res = await fetch(backendURL, {
@@ -211,27 +231,6 @@
         showMessageBox("Error al enviar los datos. Revisa la consola para más detalles.");
         console.error("Error en la solicitud fetch principal:", err);
       }
-
-      // La transición de la UI ocurre siempre, independientemente del éxito del backend
-      console.log("DEBUG: Intentando ocultar formulario y mostrar menú...");
-      const formularioElement = document.getElementById("formulario");
-      const menuElement = document.getElementById("menu");
-
-      if (formularioElement) {
-        formularioElement.style.display = "none"; // Usar !important para depuración
-        console.log("DEBUG: Formulario oculto. Current display:", formularioElement.style.display);
-      } else {
-        console.error("DEBUG: Elemento 'formulario' no encontrado.");
-      }
-
-      if (menuElement) {
-        menuElement.style.display = "grid"; // Usar !important para depuración
-        console.log("DEBUG: Menú mostrado. Current display:", menuElement.style.display);
-      } else {
-        console.error("DEBUG: Elemento 'menu' no encontrado.");
-      }
-      console.log("DEBUG: Lógica de ocultar/mostrar completada.");
-
 
       // Activar ESP32 solo si la comunicación con el backend fue exitosa
       if (backendSuccess) {
