@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>❤️ KIROBOT - Rehabilitación con Cariño</title>
   <style>
     body {
@@ -40,12 +41,6 @@
       transform: scale(1.03);
     }
 
-    .grid p {
-      margin-top: 10px;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
     .img-btn {
       width: 100%;
       max-width: 220px;
@@ -61,9 +56,8 @@
     }
 
     .video-container {
-      display: none;
+      display: none; /* Ahora solo 'none' para que esté oculto por defecto */
       min-height: 80vh;
-      display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -148,19 +142,19 @@
 
   <div class="grid" id="menu" style="display: none;">
     <div>
-      <img class="img-btn" src="Captura de pantalla 2025-05-31 141509.png" onclick="iniciarEjercicio('videos/Woman Doing Neck Lateral Stretching.mp4', 'Estiramiento lateral de cuello')">
+      <img class="img-btn" src="https://placehold.co/220x150/79c2c2/ffffff?text=Cuello" onclick="iniciarEjercicio('videos/Woman Doing Neck Lateral Stretching.mp4', 'Estiramiento lateral de cuello')">
       <p>Estiramiento de cuello</p>
     </div>
     <div>
-      <img class="img-btn" src="depositphotos_17236893-stock-illustration-human-arm-and-hand-extended.jpg" onclick="iniciarEjercicio('videos/Man standing overhead.mp4', 'Elevación de brazos de pie')">
+      <img class="img-btn" src="https://placehold.co/220x150/79c2c2/ffffff?text=Brazos" onclick="iniciarEjercicio('videos/Man standing overhead.mp4', 'Elevación de brazos de pie')">
       <p>Elevación de brazos</p>
     </div>
     <div>
-      <img class="img-btn" src="istockphoto-1064287648-612x612.jpg" onclick="iniciarCircuito(['videos/abdominal 1.gif', 'videos/abdominal 2.gif'], 'Circuito zona abdominal')">
+      <img class="img-btn" src="https://placehold.co/220x150/79c2c2/ffffff?text=Abdominal" onclick="iniciarCircuito(['videos/abdominal 1.gif', 'videos/abdominal 2.gif'], 'Circuito zona abdominal')">
       <p>Zona abdominal (circuito)</p>
     </div>
     <div>
-      <img class="img-btn" src="musculo-8783986_960_720.png" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas')">
+      <img class="img-btn" src="https://placehold.co/220x150/79c2c2/ffffff?text=Piernas" onclick="iniciarEjercicio('videos/grandmother-granny.gif', 'Flexión de piernas')">
       <p>Flexión de piernas</p>
     </div>
   </div>
@@ -189,8 +183,10 @@
         ejercicio: form.ejercicio.value,
         fechaHora: new Date().toISOString()
       };
+      // La URL de tu backend en Railway
       const backendURL = "https://backend-production-0730.up.railway.app/enviar-datos";
-      const esp32URL = "http://192.168.0.100/activar"; // 👈 Cambiar si tu IP ESP32 es distinta
+      // La URL de tu ESP32 (¡Asegúrate de que esta IP sea correcta!)
+      const esp32URL = "http://192.168.0.100/activar"; 
 
       try {
         const res = await fetch(backendURL, {
@@ -198,25 +194,37 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(datos)
         });
+
+        // Verificar si la respuesta es OK y si el tipo de contenido es JSON
+        const contentType = res.headers.get('content-type');
+        if (!res.ok || !contentType || !contentType.includes('application/json')) {
+          // Si la respuesta no es OK o no es JSON, intentar leerla como texto
+          const errorText = await res.text();
+          console.error("Error del backend o respuesta no JSON:", res.status, errorText);
+          showMessageBox(`Error del servidor (${res.status}): La respuesta no es JSON o hay un error. Contenido: ${errorText.substring(0, 200)}...`);
+          return; // Detener la ejecución si hay un error o la respuesta no es JSON
+        }
+
         const respuesta = await res.json();
-        alert(respuesta.mensaje || "Datos enviados");
+        showMessageBox(respuesta.mensaje || "Datos enviados");
 
         // ✅ Activar ESP32 luego del envío
         await fetch(esp32URL)
           .then(() => console.log("ESP32 activada"))
           .catch(err => console.error("Error al activar ESP32:", err));
 
+        // Ocultar el formulario y mostrar el menú de ejercicios
         form.style.display = "none";
         document.getElementById("menu").style.display = "grid";
       } catch (err) {
-        alert("Error al enviar los datos");
-        console.error(err);
+        showMessageBox("Error al enviar los datos. Revisa la consola para más detalles.");
+        console.error("Error en la solicitud fetch:", err);
       }
     });
 
     function iniciarEjercicio(ruta, nombre) {
       document.getElementById('menu').style.display = 'none';
-      document.getElementById('video-container').style.display = 'flex';
+      document.getElementById('video-container').style.display = 'flex'; /* Se establece a 'flex' aquí */
 
       document.getElementById('titulo-ejercicio').innerText = nombre;
       document.getElementById('cam').src = "http://192.168.0.100:81/stream";
@@ -249,7 +257,7 @@
       indiceGIF = 0;
 
       document.getElementById('menu').style.display = 'none';
-      document.getElementById('video-container').style.display = 'flex';
+      document.getElementById('video-container').style.display = 'flex'; /* Se establece a 'flex' aquí */
       document.getElementById('titulo-ejercicio').innerText = nombre;
       document.getElementById('btn-siguiente').style.display = 'inline-block';
       document.getElementById('video-ejercicio').style.display = 'none';
@@ -290,6 +298,31 @@
 
       listaGIFs = [];
       indiceGIF = 0;
+    }
+
+    // Función para mostrar un mensaje personalizado (reemplaza alert())
+    function showMessageBox(message) {
+        const messageBox = document.createElement('div');
+        messageBox.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #333;
+            max-width: 80%;
+        `;
+        messageBox.innerHTML = `
+            <p>${message}</p>
+            <button onclick="this.parentNode.remove()" style="margin-top: 15px; padding: 8px 20px; background-color: #00a9a5; color: white; border: none; border-radius: 5px; cursor: pointer;">Cerrar</button>
+        `;
+        document.body.appendChild(messageBox);
     }
   </script>
 
