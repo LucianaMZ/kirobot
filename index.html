@@ -208,17 +208,20 @@
         const respuesta = await res.json();
         showMessageBox(respuesta.mensaje || "Datos enviados");
 
-        // ✅ Activar ESP32 luego del envío
-        await fetch(esp32URL)
-          .then(() => console.log("ESP32 activada"))
-          .catch(err => console.error("Error al activar ESP32:", err));
+        // ✅ Activar ESP32 luego del envío (no bloqueante)
+        fetch(esp32URL)
+          .then(() => console.log("ESP32 activada (no bloqueante)"))
+          .catch(err => console.error("Error al activar ESP32 (no bloqueante):", err));
 
         // Ocultar el formulario y mostrar el menú de ejercicios
+        console.log("Intentando ocultar formulario y mostrar menú..."); // Línea de depuración
         form.style.display = "none";
         document.getElementById("menu").style.display = "grid";
+        console.log("Formulario oculto, menú mostrado."); // Línea de depuración
+
       } catch (err) {
         showMessageBox("Error al enviar los datos. Revisa la consola para más detalles.");
-        console.error("Error en la solicitud fetch:", err);
+        console.error("Error en la solicitud fetch principal:", err);
       }
     });
 
