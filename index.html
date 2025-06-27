@@ -196,7 +196,6 @@
           body: JSON.stringify(datos)
         });
 
-        // Verificar si la respuesta es OK y si el tipo de contenido es JSON
         const contentType = res.headers.get('content-type');
         if (!res.ok || !contentType || !contentType.includes('application/json')) {
           const errorText = await res.text();
@@ -205,7 +204,7 @@
         } else {
           const respuesta = await res.json();
           showMessageBox(respuesta.mensaje || "Datos enviados");
-          backendSuccess = true; // Establecer la bandera en true si la comunicación con el backend fue exitosa
+          backendSuccess = true;
         }
 
       } catch (err) {
@@ -214,10 +213,25 @@
       }
 
       // La transición de la UI ocurre siempre, independientemente del éxito del backend
-      console.log("Intentando ocultar formulario y mostrar menú...");
-      form.style.display = "none";
-      document.getElementById("menu").style.display = "grid";
-      console.log("Formulario oculto, menú mostrado.");
+      console.log("DEBUG: Intentando ocultar formulario y mostrar menú...");
+      const formularioElement = document.getElementById("formulario");
+      const menuElement = document.getElementById("menu");
+
+      if (formularioElement) {
+        formularioElement.style.display = "none"; // Usar !important para depuración
+        console.log("DEBUG: Formulario oculto. Current display:", formularioElement.style.display);
+      } else {
+        console.error("DEBUG: Elemento 'formulario' no encontrado.");
+      }
+
+      if (menuElement) {
+        menuElement.style.display = "grid"; // Usar !important para depuración
+        console.log("DEBUG: Menú mostrado. Current display:", menuElement.style.display);
+      } else {
+        console.error("DEBUG: Elemento 'menu' no encontrado.");
+      }
+      console.log("DEBUG: Lógica de ocultar/mostrar completada.");
+
 
       // Activar ESP32 solo si la comunicación con el backend fue exitosa
       if (backendSuccess) {
