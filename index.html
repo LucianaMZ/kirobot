@@ -190,6 +190,8 @@
         fechaHora: new Date().toISOString()
       };
       const backendURL = "https://backend-production-0730.up.railway.app/enviar-datos";
+      const esp32URL = "http://192.168.0.100/activar"; // 👈 Cambiar si tu IP ESP32 es distinta
+
       try {
         const res = await fetch(backendURL, {
           method: "POST",
@@ -198,6 +200,12 @@
         });
         const respuesta = await res.json();
         alert(respuesta.mensaje || "Datos enviados");
+
+        // ✅ Activar ESP32 luego del envío
+        await fetch(esp32URL)
+          .then(() => console.log("ESP32 activada"))
+          .catch(err => console.error("Error al activar ESP32:", err));
+
         form.style.display = "none";
         document.getElementById("menu").style.display = "grid";
       } catch (err) {
